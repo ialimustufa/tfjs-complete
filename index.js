@@ -1,8 +1,29 @@
 const webcamElement = document.getElementById('webcam');
 const classifier = knnClassifier.create();
+
+
 let net;
 
-  async function app() {
+async function setupWebcam() {
+  return new Promise((resolve, reject) => {
+    const navigatorAny = navigator;
+    navigator.getUserMedia = navigator.getUserMedia ||
+        navigatorAny.webkitGetUserMedia || navigatorAny.mozGetUserMedia ||
+        navigatorAny.msGetUserMedia;
+    if (navigator.getUserMedia) {
+      navigator.getUserMedia({video: true},
+        stream => {
+          webcamElement.srcObject = stream;
+          webcamElement.addEventListener('loadeddata',  () => resolve(), false);
+        },
+        error => reject());
+    } else {
+      reject();
+    }
+  });
+}
+
+async function app() {
   console.log('Loading mobilenet..');
 
   // Load the model.
@@ -40,28 +61,9 @@ let net;
         probability: ${result.confidences[result.classIndex]}
       `;
     }
-  }
 
     await tf.nextFrame();
   }
 }
-}
 
-async function setupWebcam() {
-  return new Promise((resolve, reject) => {
-    const navigatorAny = navigator;
-    navigator.getUserMedia = navigator.getUserMedia ||
-        navigatorAny.webkitGetUserMedia || navigatorAny.mozGetUserMedia ||
-        navigatorAny.msGetUserMedia;
-    if (navigator.getUserMedia) {
-      navigator.getUserMedia({video: true},
-        stream => {
-          webcamElement.srcObject = stream;
-          webcamElement.addEventListener('loadeddata',  () => resolve(), false);
-        },
-        error => reject());
-    } else {
-      reject();
-    }
-  });
-}
+app();
