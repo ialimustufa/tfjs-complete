@@ -1,7 +1,5 @@
 const webcamElement = document.getElementById('webcam');
 const classifier = knnClassifier.create();
-
-
 let net;
 
 async function setupWebcam() {
