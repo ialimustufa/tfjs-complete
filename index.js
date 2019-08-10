@@ -1,5 +1,6 @@
 const webcamElement = document.getElementById('webcam');
 const classifier = knnClassifier.create();
+let net;
 
   async function app() {
   console.log('Loading mobilenet..');
