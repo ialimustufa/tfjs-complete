@@ -1,0 +1,33 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="./style.css">
+    <!-- Load the latest version of TensorFlow.js -->
+    <script src="https://unpkg.com/@tensorflow/tfjs"></script>
+    <script src="https://unpkg.com/@tensorflow-models/mobilenet"></script>
+    <script src="https://unpkg.com/@tensorflow-models/knn-classifier"></script>
+
+</head>
+
+<body>
+    <div id="preload">
+        <h1>Please wait MobileNet is loading ....</h1>
+    </div>
+    <div id="postload">
+        <div id="console"></div>
+        <!-- Add an image that we will use to test -->
+        <video autoplay playsinline muted id="webcam" width="224" height="224"></video> <br>
+        <button id="class-a">Add A</button>
+        Click to add Images that belong to Class A<br> <br>
+        <button id="class-b">Add B</button>
+        Click to add Images that belong to Class B<br><br>
+        <button id="class-c">Add C</button>
+        Click to add Images that belong to Class C<br> <br>
+    </div>
+
+    <!-- Load index.js after the content of the page -->
+    <script src="./index1.js"></script>
+
+</body>
+
+</html>
