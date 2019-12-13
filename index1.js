@@ -1,8 +1,8 @@
-const webcamElement = document.getElementById('webcam');
-webcamElement.classList.add('col', 's12');
-    // webcamElement.clientWidth = '100%';
+const webcamDisplay = document.getElementById('webcam');
+webcamDisplay.classList.add('col', 's12');
+    // webcamDisplay.clientWidth = '100%';
 
-    // webcamElement.clientHeight = '50%';
+    // webcamDisplay.clientHeight = '50%';
 const classifier = knnClassifier.create();
 let net;
 
@@ -23,7 +23,7 @@ const app = async () => {
   const addExample = classId => {
     // Get the intermediate activation of MobileNet 'conv_preds' and pass that
     // to the KNN classifier.
-    const activation = net.infer(webcamElement, 'conv_preds');
+    const activation = net.infer(webcamDisplay, 'conv_preds');
 
     // Pass the intermediate activation to the classifier.
     classifier.addExample(activation, classId);
@@ -37,13 +37,14 @@ const app = async () => {
   while (true) {
     if (classifier.getNumClasses() > 0) {
       // Get the activation from mobilenet from the webcam.
-      const activation = net.infer(webcamElement, 'conv_preds');
+      const activation = net.infer(webcamDisplay, 'conv_preds');
       // Get the most likely class and confidences from the classifier module.
-      const result = await classifier.predictClass(activation);
+      const result = await classifier.predictClass(activation,3);
 
       const classes = ['A', 'B', 'C'];
       document.getElementById('console').innerText = `Prediction: ${classes[result.classIndex]}\nProbability: ${result.confidences[result.classIndex]}
       `;
+      await tf.nextFrame();
     }
 
     await tf.nextFrame();
@@ -59,10 +60,8 @@ const setupWebcam = async () => {
 
     if(navigator.getUserMedia) {
         navigator.getUserMedia({video: true}, (videoStream) => {
-            webcamElement.srcObject = videoStream;
-            webcamElement.addEventListener('loadeddata', (success) => {
-                console.log('video loaded');
-            })
+            webcamDisplay.srcObject = videoStream;
+            webcamDisplay.addEventListener('loadeddata', (success) => console.log('video loaded'))
         }, (error) => {
             alert('Error occured please check the logs in console');
             console.error(error);
