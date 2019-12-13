@@ -1,36 +1,24 @@
 const webcamElement = document.getElementById('webcam');
+webcamElement.classList.add('col', 's12');
+    // webcamElement.clientWidth = '100%';
+
+    // webcamElement.clientHeight = '50%';
 const classifier = knnClassifier.create();
 let net;
 
-async function setupWebcam() {
-  return new Promise((resolve, reject) => {
-    const navigatorAny = navigator;
-    navigator.getUserMedia = navigator.getUserMedia ||
-        navigatorAny.webkitGetUserMedia || navigatorAny.mozGetUserMedia ||
-        navigatorAny.msGetUserMedia;
-    if (navigator.getUserMedia) {
-      navigator.getUserMedia({video: true},
-        stream => {
-          webcamElement.srcObject = stream;
-          webcamElement.addEventListener('loadeddata',  () => resolve(), false);
-        },
-        error => reject());
-    } else {
-      reject();
-    }
-  });
-}
+const app = async () => {
+    document.getElementById("postload").hidden = true;
 
-async function app() {
-  console.log('Loading mobilenet..');
+    net = await mobilenet.load();
 
-  // Load the model.
-  net = await mobilenet.load();
-  console.log('Sucessfully loaded model');
+    document.getElementById("preload").hidden = true;
+    document.getElementById("postload").hidden = false;
 
-  await setupWebcam();
+    console.log('calling setupWebcam')
+    await setupWebcam();
+    console.log("Webcam call successful")
 
-  // Reads an image from the webcam and associates it with a specific class
+    // Reads an image from the webcam and associates it with a specific class
   // index.
   const addExample = classId => {
     // Get the intermediate activation of MobileNet 'conv_preds' and pass that
@@ -54,14 +42,37 @@ async function app() {
       const result = await classifier.predictClass(activation);
 
       const classes = ['A', 'B', 'C'];
-      document.getElementById('console').innerText = `
-        prediction: ${classes[result.classIndex]}\n
-        probability: ${result.confidences[result.classIndex]}
+      document.getElementById('console').innerText = `Prediction: ${classes[result.classIndex]}\nProbability: ${result.confidences[result.classIndex]}
       `;
     }
 
     await tf.nextFrame();
   }
-}
+};
+
+const setupWebcam = async () => {
+    const navigatorAny = navigator;
+    navigator.getUserMedia = navigator.getUserMedia         ||
+                             navigatorAny.webkitGetUserMedia||
+                             navigatorAny.mozGetUserMedia   ||
+                             navigatorAny.msGetUserMedia;
+
+    if(navigator.getUserMedia) {
+        navigator.getUserMedia({video: true}, (videoStream) => {
+            webcamElement.srcObject = videoStream;
+            webcamElement.addEventListener('loadeddata', (success) => {
+                console.log('video loaded');
+            })
+        }, (error) => {
+            alert('Error occured please check the logs in console');
+            console.error(error);
+        })
+    } else {
+        ((error) => {
+            alert('Error occured please check the logs in console');
+            console.error(error);
+        })();
+    }
+};
 
 app();
